@@ -1,6 +1,14 @@
 /* Jumbotron */
-.jumbotrondiv{
+/* .jumbotrondiv{
     text-align: center;
+    color: white;
+} */
+#titleJumbotron {
+    background-image: url(../images/trainstation.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center top;
+    height: 250px;
 }
 
 /* Body*/
@@ -10,7 +18,8 @@ body {
 
 /* Heading*/
 .title{
-    background: #3bafba;
+    /* background: #3bafba; */
+    background: #619B83;
     padding: 10px 0px 10px 10px;
     color: white;
 

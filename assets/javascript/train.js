@@ -47,10 +47,32 @@ database.ref().on("child_added", function(snapshot){
     // var monthsWorked = moment().diff(moment(StartD), "months")
     // var monthlyR = parseInt(childsnapshot.val().MonthlyRate)
 
-    $("#table > tbody").append("<tr> <td>" + snapshot.val().trainName + "</td>" 
+    $("#table > tbody").append("<tr> <td>" 
+    + "<i class='fas fa-train' style='color:#619B83'></i>"
+    + " " + snapshot.val().trainName + "</td>" 
     + "<td>" + snapshot.val().destination + "</td>" 
     + "<td>" + parseInt(snapshot.val().frequency) + "</td>" 
     + "<td>" + "09:00" + "</td>"
     + "<td>" + "45" +  "</td> </tr>")
 
 });
+
+// <span class="fa-stack fa-2x">
+//   <i class="fas fa-camera fa-stack-1x"></i>
+//   <i class="fas fa-ban fa-stack-2x" style="color:Tomato"></i>
+// </span>
+
+// <span class="fa-stack fa-2x">
+//   <i class="fas fa-square fa-stack-2x"></i>
+//   <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+// </span>
+
+// + "<span class='fa-stack fa-2x'>"
+// +   "<i class='fas fa-square fa-stack-2x' style='color:#3bafba'></i>"
+// +   "<i class='fas fa-train fa-stack-1x fa-inverse'></i>"
+// + "</span>"
+
+// <i class="far fa-edit"></i>
+// <i class="far fa-trash-alt"></i>
+
+// https://fontawesome.com/license
