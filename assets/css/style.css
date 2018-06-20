@@ -1,0 +1,39 @@
+/* Jumbotron */
+.jumbotrondiv{
+    text-align: center;
+}
+
+/* Body*/
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Heading*/
+.title{
+    background: #3bafba;
+    padding: 10px 0px 10px 10px;
+    color: white;
+
+}
+
+/* Table*/
+thead {
+    border-bottom: 1px solid #000000;
+    background-color: #d3d3d3
+}
+
+tr {
+    border-top: 1px solid #000000;
+}
+  
+th{
+    padding: 0 4em 0 0;
+}
+
+.tableEntry {
+    color: #767A79;
+}
+/* Form */
+input {
+    width: 100%;
+}
