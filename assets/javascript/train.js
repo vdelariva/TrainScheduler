@@ -24,6 +24,31 @@ var trainData = {
     minutesAway: 0,
 
 }
+// Initialize minute interval counter
+var minuteTimer = setInterval(minuteCountdown, 60000);
+$("#currentDate").text(moment().format("MMMM Do YYYY, H:mm"));
+
+function minuteCountdown() {
+    console.log("Timer")
+    // for each train added to the dom, decrement the minutes to train arrival
+    $(".mins").each(function(){
+        var min = parseInt($(this).text());
+        console.log("min val: "+min) // Why is this logging twice?
+        min--;
+        if (min == 0){
+            // get the start time for this train
+            // get the frequency for this train
+            // updateTrainTime (startTime,frequency)
+            // update the display for next arrival and minutes away
+        }
+        // console.log("this: " +JSON.stringify($(this)))
+        // Update the display time to next train
+        $(this).text(min)
+        $("#currentDate").text(moment().format("MMMM Do YYYY, H:mm"));
+
+    })
+}
+
 
 // Capture Button Click
 $("#submit").on("click", function(event) {
@@ -45,40 +70,29 @@ $("#submit").on("click", function(event) {
 // When item added to database
 database.ref().on("child_added", function(snapshot){       
 
-    // Get the first train time, convert time format
+    console.log(JSON.stringify(snapshot))
+
+    // Get the first train time, convert to UTC
     var time = moment(snapshot.val().trainTime,"HH:mm")
+    var frequency = snapshot.val().frequency
+
+    var minToA = updateTrainTime(time,frequency);
+
+    console.log("time: "+time)
 
     console.log("Name: "+snapshot.val().trainName)
-    console.log("trainTime: "+ moment(time).format("HH:mm"))
-    console.log("Time"+time);
-    console.log("now: "+moment().format("HH:mm"));
+    // console.log("trainTime: "+ moment(time).format("HH:mm"))
+    // console.log("Time"+time);
+    // console.log("now: "+moment().format("HH:mm"));
 
-    // Calculate the time difference between now and the first train time
-    var trainDiff = moment().diff(moment(time),"minutes");
-    console.log("diff: "+trainDiff)
-
-    // Use modulus operater to calculate the minutes to next train
-    var remainder = trainDiff % snapshot.val().frequency
-    console.log("remainder: "+remainder)
-
-    var minToArrival;
-    // If the first train of the day has not arrived, the remainder is the time for the next train arrival
-    if (trainDiff < 0) {
-        minToArrival = Math.abs(remainder);
-    }
-    // Otherwise, calculate arrival time by subtracting the remainder from the frequency
-    else {
-        minToArrival = snapshot.val().frequency - remainder;
-    }
-    console.log("Arrival: "+minToArrival)
-
+    // Display train entry
     $("#schedule > tbody").append("<tr>" 
     + "<th scope='row'><i class='fas fa-train' style='color:#619B83'></i></th>"
     + "<td>" + snapshot.val().trainName + "</td>" 
     + "<td>" + snapshot.val().destination + "</td>" 
     + "<td>" + parseInt(snapshot.val().frequency) + "</td>" 
-    + "<td>" + moment().add(minToArrival,"minutes").format("HH:mm") + "</td>"
-    + "<td>" + minToArrival +  "</td>"
+    + "<td>" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
+    + "<td class='mins'>" + minToA +  "</td>"
     + "<td><i class='far fa-edit edit'></i></td>"
     + "<td><i class='far fa-trash-alt trash'></i></tr>")
 
@@ -92,23 +106,26 @@ $(document).on("click",".trash", function(event) {
     console.log("trash");
 });
 
+// Display next train time
+// startTime:UTC, frequency: integer
+function updateTrainTime (startTime,frequency) {
 
-// <span class="fa-stack fa-2x">
-//   <i class="fas fa-camera fa-stack-1x"></i>
-//   <i class="fas fa-ban fa-stack-2x" style="color:Tomato"></i>
-// </span>
+    // Calculate the time difference between now and the first train time
+    var trainDiff = moment().diff(startTime,"minutes");
 
-// <span class="fa-stack fa-2x">
-//   <i class="fas fa-square fa-stack-2x"></i>
-//   <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
-// </span>
+    // If trainDiff is negative: remainder = minutes to next train
+    // If trainDiff is positive: remainder = minutes since last train
+    var remainder = trainDiff % frequency;
 
-// + "<span class='fa-stack fa-2x'>"
-// +   "<i class='fas fa-square fa-stack-2x' style='color:#3bafba'></i>"
-// +   "<i class='fas fa-train fa-stack-1x fa-inverse'></i>"
-// + "</span>"
-
-// <i class="far fa-edit"></i>
-// <i class="far fa-trash-alt"></i>
+    var minToArrival;
+    if (trainDiff < 0) {
+        minToArrival = Math.abs(remainder)+1;
+    }
+    else {
+        minToArrival = frequency - remainder;
+    }
+    return(minToArrival);
+    
+}
 
 // https://fontawesome.com/license
