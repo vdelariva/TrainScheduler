@@ -26,29 +26,43 @@ var trainData = {
 }
 // Initialize minute interval counter
 var minuteTimer = setInterval(minuteCountdown, 60000);
+// var minuteTimer = setTimeout(minuteCountdown, 5000); // Used for testing
 $("#currentDate").text(moment().format("MMMM Do YYYY, H:mm"));
 
 function minuteCountdown() {
     console.log("Timer")
     // for each train added to the dom, decrement the minutes to train arrival
     $(".mins").each(function(){
-        var min = parseInt($(this).text());
-        console.log("min val: "+min) // Why is this logging twice?
+        let curMinArrElement = $(this);  // create copy of 'this', it gets reassigned when reading from database
+        let min = parseInt($(this).text());
+        console.log("mins: "+min)
         min--;
         if (min == 0){
-            // get the start time for this train
-            // get the frequency for this train
-            // updateTrainTime (startTime,frequency)
-            // update the display for next arrival and minutes away
-        }
-        // console.log("this: " +JSON.stringify($(this)))
-        // Update the display time to next train
-        $(this).text(min)
-        $("#currentDate").text(moment().format("MMMM Do YYYY, H:mm"));
+            let currKey = curMinArrElement.attr("data-key")
+            let trainRef=database.ref(currKey);
+            trainRef.once("value", function(data){
+                // console.log("data: "+JSON.stringify(data.val()))
+                let time = moment(data.val().trainTime,"HH:mm");
+                let frequency = data.val().frequency;
+            
+                let minToA = updateTrainTime(time,frequency);
+                // console.log("new time: "+minToA);
+                // console.log("this1: " +curMinArrElement);
 
+                curMinArrElement.text(minToA); // Update minutes to arrival
+                // console.log("currKey: "+currKey)
+                // console.log("train time: "+JSON.stringify($(".arrTime[data-key=currKey]")))
+                // $(".arrTime[data-key=currKey]").text("Test")
+                // $(".arrTime[data-key=currKey]").text(moment().add(minToA,"minutes").format("HH:mm"));
+                // + "<td class='arrTime' data-key="+snapshot.key+">" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
+            })
+        }
+        else {
+            curMinArrElement.text(min);
+        }
+        $("#currentDate").text(moment().format("MMMM Do YYYY, H:mm")); // Update current date/time display
     })
 }
-
 
 // Capture Button Click
 $("#submit").on("click", function(event) {
@@ -59,6 +73,7 @@ $("#submit").on("click", function(event) {
     trainData.trainTime= $("#trainTime").val().trim();
     trainData.frequency = $("#frequency").val().trim();
  
+    // database.ref("trainSchedule/").push({
     database.ref().push({
         trainName: trainData.trainName,
         destination: trainData.destination,
@@ -73,14 +88,13 @@ database.ref().on("child_added", function(snapshot){
     console.log(JSON.stringify(snapshot))
 
     // Get the first train time, convert to UTC
-    var time = moment(snapshot.val().trainTime,"HH:mm")
-    var frequency = snapshot.val().frequency
+    let time = moment(snapshot.val().trainTime,"HH:mm")
+    let frequency = snapshot.val().frequency
 
-    var minToA = updateTrainTime(time,frequency);
-
-    console.log("time: "+time)
+    let minToA = updateTrainTime(time,frequency);
 
     console.log("Name: "+snapshot.val().trainName)
+    // console.log("key: ", snapshot.key)
     // console.log("trainTime: "+ moment(time).format("HH:mm"))
     // console.log("Time"+time);
     // console.log("now: "+moment().format("HH:mm"));
@@ -91,8 +105,8 @@ database.ref().on("child_added", function(snapshot){
     + "<td>" + snapshot.val().trainName + "</td>" 
     + "<td>" + snapshot.val().destination + "</td>" 
     + "<td>" + parseInt(snapshot.val().frequency) + "</td>" 
-    + "<td>" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
-    + "<td class='mins'>" + minToA +  "</td>"
+    + "<td class='arrTime' data-key="+snapshot.key+">" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
+    + "<td class='mins' data-key="+snapshot.key+">" + minToA +  "</td>"
     + "<td><i class='far fa-edit edit'></i></td>"
     + "<td><i class='far fa-trash-alt trash'></i></tr>")
 
@@ -100,10 +114,12 @@ database.ref().on("child_added", function(snapshot){
 
 $(document).on("click",".edit", function(event) {
     console.log("edit");
+    // Ideally, I would have code here that would edit the entry
 });
 
 $(document).on("click",".trash", function(event) {
     console.log("trash");
+    // Ditto, code to delete the train entry... oh, well...
 });
 
 // Display next train time
