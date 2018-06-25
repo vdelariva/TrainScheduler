@@ -3,7 +3,7 @@
 
 **Description:**
 
-The purpose of this assignment was to create a train schedule. The minimim capbilities include:
+The purpose of this assignment was to create a train schedule. The minimim capabilities include:
   * When adding trains, administrators are be able to submit the following:
     * Train Name
     * Destination
