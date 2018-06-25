@@ -41,20 +41,12 @@ function minuteCountdown() {
             let currKey = curMinArrElement.attr("data-key")
             let trainRef=database.ref(currKey);
             trainRef.once("value", function(data){
-                // console.log("data: "+JSON.stringify(data.val()))
                 let time = moment(data.val().trainTime,"HH:mm");
                 let frequency = data.val().frequency;
-            
-                let minToA = updateTrainTime(time,frequency);
-                // console.log("new time: "+minToA);
-                // console.log("this1: " +curMinArrElement);
+                let minToA = updateTrainTime(time,frequency); // Get minutes to next train arrival
 
                 curMinArrElement.text(minToA); // Update minutes to arrival
-                // console.log("currKey: "+currKey)
-                // console.log("train time: "+JSON.stringify($(".arrTime[data-key=currKey]")))
-                // $(".arrTime[data-key=currKey]").text("Test")
-                // $(".arrTime[data-key=currKey]").text(moment().add(minToA,"minutes").format("HH:mm"));
-                // + "<td class='arrTime' data-key="+snapshot.key+">" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
+                $(".arrTime[data-key="+currKey+"]").text(moment().add(minToA,"minutes").format("HH:mm")) // Update next train arrival time
             })
         }
         else {
@@ -73,7 +65,6 @@ $("#submit").on("click", function(event) {
     trainData.trainTime= $("#trainTime").val().trim();
     trainData.frequency = $("#frequency").val().trim();
  
-    // database.ref("trainSchedule/").push({
     database.ref().push({
         trainName: trainData.trainName,
         destination: trainData.destination,
@@ -85,19 +76,10 @@ $("#submit").on("click", function(event) {
 // When item added to database
 database.ref().on("child_added", function(snapshot){       
 
-    console.log(JSON.stringify(snapshot))
-
     // Get the first train time, convert to UTC
     let time = moment(snapshot.val().trainTime,"HH:mm")
     let frequency = snapshot.val().frequency
-
     let minToA = updateTrainTime(time,frequency);
-
-    console.log("Name: "+snapshot.val().trainName)
-    // console.log("key: ", snapshot.key)
-    // console.log("trainTime: "+ moment(time).format("HH:mm"))
-    // console.log("Time"+time);
-    // console.log("now: "+moment().format("HH:mm"));
 
     // Display train entry
     $("#schedule > tbody").append("<tr>" 
@@ -109,7 +91,6 @@ database.ref().on("child_added", function(snapshot){
     + "<td class='mins' data-key="+snapshot.key+">" + minToA +  "</td>"
     + "<td><i class='far fa-edit edit'></i></td>"
     + "<td><i class='far fa-trash-alt trash'></i></tr>")
-
 });
 
 $(document).on("click",".edit", function(event) {
@@ -143,5 +124,3 @@ function updateTrainTime (startTime,frequency) {
     return(minToArrival);
     
 }
-
-// https://fontawesome.com/license
