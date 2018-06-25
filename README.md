@@ -4,7 +4,7 @@
 **Description:**
 
 The purpose of this assignment was to create a train schedule. The minimim capbilities include:
-  * When adding trains, administrators should be able to submit the following:
+  * When adding trains, administrators are be able to submit the following:
     * Train Name
     * Destination
     * First Train Time -- in military time
