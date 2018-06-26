@@ -14,8 +14,6 @@ The purpose of this assignment was to create a train schedule. The minimim capab
   
 Additional features include a minute timer that updates the current time displayed and decrements the time to next time arrival. When the time to train arrival equal zero, the app recalculates the next train time and minutes to arrival. Also added the capability to delete a train from the schedule by clicking the trash can icon. The edit train icon does not function.
 
-Added icons to edit and delete a train entry, but the code to do this doesn't exist yet...
-
 **Assets Used**
 
 fontawesome.com
