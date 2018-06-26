@@ -100,9 +100,7 @@ $(document).on("click",".edit", function(event) {
 });
 
 $(document).on("click",".trash", function(event) {
-    console.log("trash");
     let currKey = $(this).attr("data-key");
-    console.log("key: "+currKey);
     let trainRef=database.ref(currKey);
     trainRef.remove();
     $("#"+currKey).remove();
