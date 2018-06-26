@@ -30,12 +30,10 @@ var minuteTimer = setInterval(minuteCountdown, 60000);
 $("#currentDate").text(moment().format("MMMM Do YYYY, H:mm"));
 
 function minuteCountdown() {
-    console.log("Timer")
     // for each train added to the dom, decrement the minutes to train arrival
     $(".mins").each(function(){
         let curMinArrElement = $(this);  // create copy of 'this', it gets reassigned when reading from database
         let min = parseInt($(this).text());
-        console.log("mins: "+min)
         min--;
         if (min == 0){
             let currKey = curMinArrElement.attr("data-key")
@@ -59,7 +57,6 @@ function minuteCountdown() {
 // Capture Button Click
 $("#submit").on("click", function(event) {
     event.preventDefault();
-    console.log($("trainName").val())
     trainData.trainName = $("#trainName").val().trim();
     trainData.destination = $("#destination").val().trim();
     trainData.trainTime= $("#trainTime").val().trim();
@@ -75,23 +72,27 @@ $("#submit").on("click", function(event) {
 
 // When item added to database
 database.ref().on("child_added", function(snapshot){       
-
-    // Get the first train time, convert to UTC
-    let time = moment(snapshot.val().trainTime,"HH:mm")
-    let frequency = snapshot.val().frequency
-    let minToA = updateTrainTime(time,frequency);
-
-    // Display train entry
-    $("#schedule > tbody").append("<tr>" 
-    + "<th scope='row'><i class='fas fa-train' style='color:#619B83'></i></th>"
-    + "<td>" + snapshot.val().trainName + "</td>" 
-    + "<td>" + snapshot.val().destination + "</td>" 
-    + "<td>" + parseInt(snapshot.val().frequency) + "</td>" 
-    + "<td class='arrTime' data-key="+snapshot.key+">" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
-    + "<td class='mins' data-key="+snapshot.key+">" + minToA +  "</td>"
-    + "<td><i class='far fa-edit edit'></i></td>"
-    + "<td><i class='far fa-trash-alt trash'></i></tr>")
+    displaySchedule(snapshot);
 });
+
+function displaySchedule (snapshot) {
+
+        // Get the first train time, convert to UTC
+        let time = moment(snapshot.val().trainTime,"HH:mm")
+        let frequency = snapshot.val().frequency
+        let minToA = updateTrainTime(time,frequency);
+    
+        // Display train entry
+        $("#schedule > tbody").append("<tr id="+snapshot.key+">" 
+        + "<th scope='row'><i class='fas fa-train' style='color:#619B83'></i></th>"
+        + "<td>" + snapshot.val().trainName + "</td>" 
+        + "<td>" + snapshot.val().destination + "</td>" 
+        + "<td>" + parseInt(snapshot.val().frequency) + "</td>" 
+        + "<td class='arrTime' data-key="+snapshot.key+">" + moment().add(minToA,"minutes").format("HH:mm") + "</td>"
+        + "<td class='mins' data-key="+snapshot.key+">" + minToA +  "</td>"
+        + "<td><i class='far fa-edit edit' data-key="+snapshot.key+"></i></td>"
+        + "<td><i class='far fa-trash-alt trash' data-key="+snapshot.key+"></i></tr>")
+}
 
 $(document).on("click",".edit", function(event) {
     console.log("edit");
@@ -100,7 +101,11 @@ $(document).on("click",".edit", function(event) {
 
 $(document).on("click",".trash", function(event) {
     console.log("trash");
-    // Ditto, code to delete the train entry... oh, well...
+    let currKey = $(this).attr("data-key");
+    console.log("key: "+currKey);
+    let trainRef=database.ref(currKey);
+    trainRef.remove();
+    $("#"+currKey).remove();
 });
 
 // Display next train time
